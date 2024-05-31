@@ -147,7 +147,7 @@ class _VillagersListState extends State<VillagersList> {
 
   Future<void> fetchVillagers() async {
     final response = await http.get(
-      Uri.parse('https://api.nookipedia.com/villagers?species=cat'),
+      Uri.parse('https://api.nookipedia.com/villagers'),
       headers: {
         'X-API-KEY':
             '1e12770e-930f-4f94-8bf2-7dd37587e30b', // Replace with your actual API key
@@ -173,13 +173,61 @@ class _VillagersListState extends State<VillagersList> {
             itemCount: villagers.length,
             itemBuilder: (context, index) {
               return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(villagers[index]['image_url']),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          VillagerDetailPage(villager: villagers[index]),
+                    ),
+                  );
+                },
+                leading: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Image.network(
+                    villagers[index]['image_url'],
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 title: Text(villagers[index]['name']),
-                subtitle: Text(villagers[index]['personality']),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(villagers[index]['species']),
+                    Text(villagers[index]['personality']),
+                  ],
+                ),
               );
             },
           );
+  }
+}
+
+class VillagerDetailPage extends StatelessWidget {
+  final Map<String, dynamic> villager;
+
+  const VillagerDetailPage({Key? key, required this.villager})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(villager['name']),
+        backgroundColor: Colors.purple,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Species: ${villager['species']}'),
+            Text('Personality: ${villager['personality']}'),
+            // Add more details as needed
+          ],
+        ),
+      ),
+    );
   }
 }
